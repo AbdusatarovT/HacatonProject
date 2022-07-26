@@ -10,6 +10,6 @@ def send_confirmation_mail(code, email):
     send_mail(
         'Код для активации аккаунта',
         full_link,
-        'lgtahir93@gmail.com',
+        'shamuza0102@gmail.com',
         [email]
     )
