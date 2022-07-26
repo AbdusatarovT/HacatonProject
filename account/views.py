@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model, authenticate
-from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from account.serializers import RegisterSerializer, UserLoginSerializer
+from account.serializers import RegisterSerializer, UserLoginSerializer, ChangePasswordSerializer, ForgotPasswordSerializer, ForgotPasswordCompleteSerializer
+from rest_framework.permissions import IsAuthenticated 
+
 
 User = get_user_model()
 
@@ -15,6 +16,7 @@ class RegisterApiView(APIView):
             serializers.save()
             massage = f'Успешная регистрация!. Письмо отправленно Вам на почту.'
             return Response(massage, status=201)
+
 
 '''Функция для активации аккаунта'''
 class ActivationView(APIView):
@@ -39,6 +41,31 @@ class UserLoginView(APIView):
             return Response(massage, status=200)
 
 
+'''Фукция для смены пароля'''
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializers = ChangePasswordSerializer(data=request.data, context={'request': request})                               
+        serializers.is_valid(raise_exception=True)
+        serializers.update()
+        return Response('Пароль успешно обнавлен!')
 
 
+'''Функция для востановления пароля по почте'''
+class ForgotPasswordView(APIView):
+    def post(self, request):
+        data = request.data
+        serializer = ForgotPasswordSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.send_code()
+        return Response('Вам отправлено письмо для восстановления пароля')
 
+
+class ForgotPasswordComplete(APIView):
+    def post(self, request):
+        data = request.data
+        serializer = ForgotPasswordCompleteSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.set_new_pass()
+        return Response('Паротль был успешно изменен!')
