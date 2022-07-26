@@ -37,9 +37,10 @@ class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        serializers = ChangePasswordSerializer(data=request.data, context={'request': request})                               
+        serializers = ChangePasswordSerializer(data=request.data,
+                                               context={'request': request})
         serializers.is_valid(raise_exception=True)
-        serializers.update()
+        serializers.save()
         return Response('Пароль успешно обнавлен!')
 
 
