@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from account.utils import send_confirmation_mail
 from django.core.mail import send_mail
-
+from django.contrib.auth.password_validation import validate_password
 User = get_user_model()
 
 
@@ -51,11 +51,13 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Неверный пароль!')
         return p
 
-    def update(self):
-        user = self.context.get('request').user
-        password = self.validated_data.get('password')
+    def save(self, **kwargs):
+        password = self.validated_data['new_password']
+        user = self.context['request'].user
         user.set_password(password)
         user.save()
+        return user
+
 
 
 '''Сериалайзер для Востановления пароля через почту'''
