@@ -16,7 +16,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField()
+    owner = serializers.ReadOnlyField(source='owner.email')
 
     class Meta:
         model = Comment
