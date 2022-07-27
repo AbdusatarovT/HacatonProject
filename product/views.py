@@ -44,21 +44,6 @@ class ProductView(ModelViewSet):
         obj.save()
         return Response(request.data, status=201)
 
-    @action(methods=['POST'], detail=True) 
-    def like(self, request, pk, *args, **kwargs):
-        try:
-            like_object, _ = Like.objects.get_or_create(owner=request.user, product_id=pk)
-            like_object.like = not like_object.like
-            like_object.save()
-            status = 'liked'
-
-            if like_object.like:
-                return Response({'status': status})
-            status = 'unliked'
-            return Response({'status': status})
-        except:
-            return Response('Нет такого продукта!')
-
 
     @action(methods=['POST'], detail=True)
     def like(self, request, pk, *args, **kwargs):
