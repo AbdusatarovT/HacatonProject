@@ -15,3 +15,4 @@ admin.site.register(Product, ProsuctAdmn)
 admin.site.register(Comment)
 admin.site.register(Image)
 admin.site.register(Rating)
+

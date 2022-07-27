@@ -55,6 +55,16 @@ class Comment(models.Model):
         return f'Comment for {self.product}'
 
 
+
+class Like(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes', verbose_name='Владелец лайка')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='likes', verbose_name='Товар')
+    like = models.BooleanField('лайк', default=False)
+
+    def __str__(self):
+        return f'{self.product} {self.like}'
+
+
 class Image(models.Model):
 
     image = models.ImageField(upload_to='product')
