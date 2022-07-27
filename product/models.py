@@ -21,6 +21,7 @@ class Category(models.Model):
 class Product(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='product')
     name = models.CharField(max_length=100, unique=True)
+    amount = models.PositiveIntegerField(default=1)
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')

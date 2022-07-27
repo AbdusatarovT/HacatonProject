@@ -15,7 +15,6 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 class ProductSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True, read_only=True)
     
@@ -25,7 +24,6 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-
         representation['likes'] = instance.likes.filter(like=True).count()
 
         representation['comments'] = CommentSerializer(instance.comments.all(), many=True).data
@@ -39,7 +37,6 @@ class ProductSerializer(serializers.ModelSerializer):
             pass
         return representation
 
-
     def create(self, validated_data):
         requests = self.context.get('request')
         images = requests.FILES
@@ -49,6 +46,7 @@ class ProductSerializer(serializers.ModelSerializer):
             Image.objects.create(product=product, image=image)
 
         return product
+
 
 class CommentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')

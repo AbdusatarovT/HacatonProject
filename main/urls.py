@@ -21,5 +21,6 @@ urlpatterns = [
     path('swagger/', schema_view.with_ui('swagger')),
     path('admin/', admin.site.urls),
     path('product/', include('product.urls')),
-    path('api/account/', include('account.urls'))
+    path('api/account/', include('account.urls')),
+    path('cart/', include('cart.urls'))
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -19,7 +19,6 @@ class CategoryView(ModelViewSet):
     permission_classes = [IsAdminUser]
    
 
-
 class ProductView(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -30,6 +29,10 @@ class ProductView(ModelViewSet):
     filterset_fields = ['category']
     ordering_fields = ['name'] 
     search_fields = ['name'] 
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
 
     @action(methods=['POST'], detail=True)
     def rating(self, request, pk, *args, **kwargs):
@@ -55,6 +58,21 @@ class ProductView(ModelViewSet):
             return Response({'status': status})
         except:
             return Response('Нет такого продукта!')
+
+
+    @action(methods=['POST'], detail=True)
+    def like(self, request, pk, *args, **kwargs):
+        try:
+            like_object, _ = Like.objects.get_or_create(owner=request.user, product_id=pk)
+            like_object.like = not like_object.like
+            like_object.save()
+            status = 'like'
+
+            if like_object.like:
+                return Response('Вы поставили лайк :)')
+            return Response('Вы убрали лайк :(')
+        except:
+            return Response('К сожалению, такого продукта нет')
 
 
 class CommentView(ModelViewSet):
