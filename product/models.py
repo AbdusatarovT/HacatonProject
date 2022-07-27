@@ -1,3 +1,4 @@
+
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -38,5 +39,8 @@ class Comment(models.Model):
         return f'Comment for {self.product}'
 
 
+class Image(models.Model):
 
+    image = models.ImageField(upload_to='product')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
 
