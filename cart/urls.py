@@ -5,6 +5,7 @@ from cart.views import OrderView
 router = DefaultRouter()
 router.register('', OrderView)
 
-urlpatterns = []
+urlpatterns = [
+    path('', include(router.urls))
+]
 
-urlpatterns.extend(router.urls)
