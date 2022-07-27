@@ -1,5 +1,4 @@
 from rest_framework import serializers
-
 from product.models import Product, Category, Comment, Image
 
 
@@ -24,6 +23,20 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['comments'] = CommentSerializer(instance.comments.all(), many=True).data
+
+        result = 0
+        for rating in instance.ratings.all():
+            result += int(rating.rating)
+        try:
+            representation['ratings'] = result / instance.ratings.all().count()
+        except ZeroDivisionError:
+            pass
+        return representation
+
+
     def create(self, validated_data):
         requests = self.context.get('request')
         images = requests.FILES
@@ -41,3 +54,6 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = '__all__'
 
+
+class RatingSerializer(serializers.Serializer):
+    rating = serializers.IntegerField(required=True, min_value=1, max_value=10)
