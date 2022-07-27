@@ -28,11 +28,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    'drf_yasg',
     'rest_framework',
     'django_filters',
     'account',
     'cart',
     'product',
+    
 
 ]
 
@@ -149,6 +151,15 @@ REST_FRAMEWORK = {
 
 }
 
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    }
+}
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
