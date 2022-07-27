@@ -4,7 +4,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
-from product.models import Category, Product, Comment, Rating
+from product.models import Category, Product, Comment, Rating, Like
 from product.serializers import CategorySerializer, ProductSerializer, CommentSerializer, RatingSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -19,7 +19,6 @@ class CategoryView(ModelViewSet):
     permission_classes = [IsAdminUser]
    
 
-
 class ProductView(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -31,6 +30,10 @@ class ProductView(ModelViewSet):
     ordering_fields = ['name'] 
     search_fields = ['name'] 
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
     @action(methods=['POST'], detail=True)
     def rating(self, request, pk, *args, **kwargs):
         serializer = RatingSerializer(data=request.data)
@@ -40,6 +43,21 @@ class ProductView(ModelViewSet):
         obj.rating = request.data['rating']
         obj.save()
         return Response(request.data, status=201)
+
+
+    @action(methods=['POST'], detail=True)
+    def like(self, request, pk, *args, **kwargs):
+        try:
+            like_object, _ = Like.objects.get_or_create(owner=request.user, product_id=pk)
+            like_object.like = not like_object.like
+            like_object.save()
+            status = 'like'
+
+            if like_object.like:
+                return Response('Вы поставили лайк :)')
+            return Response('Вы убрали лайк :(')
+        except:
+            return Response('К сожалению, такого продукта нет')
 
 
 class CommentView(ModelViewSet):
