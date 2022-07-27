@@ -1,8 +1,9 @@
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from account.serializers import RegisterSerializer, UserLoginSerializer, ChangePasswordSerializer, ForgotPasswordSerializer, ForgotPasswordCompleteSerializer
-from rest_framework.permissions import IsAuthenticated 
+from account.serializers import RegisterSerializer, ChangePasswordSerializer, ForgotPasswordSerializer, ForgotPasswordCompleteSerializer
+from rest_framework.permissions import IsAuthenticated
+
 
 
 User = get_user_model()
@@ -31,24 +32,15 @@ class ActivationView(APIView):
             return Response({'msg': 'Неверный код!'}, status=400)
 
 
-'''функция входа в аккаунт'''
-class UserLoginView(APIView):
-    def post(self, request):
-        data = request.data
-        serializers = UserLoginSerializer(data=data)
-        if serializers.is_valid(raise_exception=True):
-            massage = f'Вы успешно зашли в свой аккаунт!'
-            return Response(massage, status=200)
-
-
 '''Фукция для смены пароля'''
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        serializers = ChangePasswordSerializer(data=request.data, context={'request': request})                               
+        serializers = ChangePasswordSerializer(data=request.data,
+                                               context={'request': request})
         serializers.is_valid(raise_exception=True)
-        serializers.update()
+        serializers.save()
         return Response('Пароль успешно обнавлен!')
 
 
@@ -69,3 +61,6 @@ class ForgotPasswordComplete(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.set_new_pass()
         return Response('Паротль был успешно изменен!')
+
+
+

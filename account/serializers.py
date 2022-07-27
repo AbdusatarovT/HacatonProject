@@ -1,8 +1,8 @@
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from account.utils import send_confirmation_mail
 from django.core.mail import send_mail
-
+from django.contrib.auth.password_validation import validate_password
 User = get_user_model()
 
 
@@ -29,28 +29,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         return User
 
 
-'''Сериалайзер для входа в аккаунт'''
-class UserLoginSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    password = serializers.CharField(required=True)
-
-    def validate_email(self, email):
-        if not User.objects.filter(email=email).exists():
-            raise serializers.ValidationError('Такой пользователь не зарегистрирован!')
-        # print(email)
-        return email
-
-    def validate(self, attrs):
-        email = attrs.get('email')
-        password = attrs.get('password')
-        # print(password)
-        if email and password:
-            user = authenticate(username=email, password=password)
-            # print(user)
-            if not user:
-                raise serializers.ValidationError('Вы указали неверный email или пароль!')
-            attrs['user'] = user
-            return attrs
 
 '''Сериалайзер для изменения пароля'''
 class ChangePasswordSerializer(serializers.ModelSerializer):
@@ -73,11 +51,13 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Неверный пароль!')
         return p
 
-    def update(self):
-        user = self.context.get('request').user
-        password = self.validated_data.get('password')
+    def save(self, **kwargs):
+        password = self.validated_data['new_password']
+        user = self.context['request'].user
         user.set_password(password)
         user.save()
+        return user
+
 
 
 '''Сериалайзер для Востановления пароля через почту'''
@@ -109,15 +89,12 @@ class ForgotPasswordCompleteSerializer(serializers.Serializer):
     password_confirm = serializers.CharField(required=True)
 
     def validate_email(self, email):
-        print(email)
         if not User.objects.filter(email=email).exists():
             raise serializers.ValidationError('Пользователь не зарегистрирован')
         return email
 
     def validate_code(self, code):
-        print(code)
         if not User.objects.filter(activation_code=code).exists():
-            print(code)
             raise serializers.ValidationError('Пользователь не зарегистрирован')
         return code
 
